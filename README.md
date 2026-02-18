@@ -33,7 +33,7 @@ This project detects faces using MediaPipe and predicts emotions in real-time an
 ---
 
 ## 📂 Project Structure
-
+```
 Face-Emotion-Recoginition/
 │
 ├── src/
@@ -41,7 +41,7 @@ Face-Emotion-Recoginition/
 │ ├── realtime_infer.py # Real-time webcam inference logic
 │ ├── train.py # Model training script
 │ ├── utils.py # Helper functions 
-
+```
 ---
 
 ## Model Architecture
