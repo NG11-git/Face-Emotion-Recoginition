@@ -11,6 +11,7 @@ from utils import EarlyStopping, plot_curves
 # transformations for the training and validation sets
 image_transform = {
     'train' : transforms.Compose([
+        transforms.Grayscale(3),
         transforms.RandomResizedCrop(size=256, scale=(0.8,1.0)),
         transforms.RandomRotation(degrees=15),
         transforms.RandomHorizontalFlip(),
@@ -22,6 +23,7 @@ image_transform = {
         )
     ]),
     'valid' : transforms.Compose([
+        transforms.Grayscale(3),
         transforms.Resize(225),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
@@ -107,30 +109,46 @@ class CBAM(nn.Module):
 # Define ResNet18 with CBAM
 
 class ResNet18_CBAM(nn.Module):
-    def __init__(self, num_classes=7):       #FER has 7 classes
+    def __init__(self, num_classes=7):
         super().__init__()
+        
         base_model = resnet18(pretrained=True)
-        self.features = nn.Sequential(
-            base_model.conv1,
-            base_model.bn1,
-            base_model.relu,
-            base_model.maxpool,
-            base_model.layer1,
-            CBAM(64),
-            base_model.layer2,
-            CBAM(128),
-            base_model.layer3,
-            CBAM(256),
-            base_model.layer4,
-            CBAM(512),
-        )
-        self.pool = nn.AdaptiveAvgPool2d((1, 1))
+
+        # Initial layers
+        self.conv1 = base_model.conv1
+        self.bn1 = base_model.bn1
+        self.relu = base_model.relu
+        self.maxpool = base_model.maxpool
+
+        # Residual layers + CBAM
+        self.layer1 = nn.Sequential(base_model.layer1, CBAM(64))
+        self.layer2 = nn.Sequential(base_model.layer2, CBAM(128))
+        self.layer3 = nn.Sequential(base_model.layer3, CBAM(256))
+        self.layer4 = nn.Sequential(base_model.layer4, CBAM(512))
+
+        # Classification head
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
         self.fc = nn.Linear(512, num_classes)
 
     def forward(self, x):
-        x = self.features(x)
-        x = self.pool(x).view(x.size(0), -1)
-        return self.fc(x)
+        x = self.conv1(x)
+        x = self.bn1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+
+        x = self.layer1(x)
+        x = self.layer2(x)
+        x = self.layer3(x)
+        x = self.layer4(x)
+
+        x = self.avgpool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+
+        return x
+
+
+
 #----------------------------------#
 
 # device configuration
@@ -183,7 +201,7 @@ for epoch in range(epochs):
             loss = criterion(outputs, labels)
             val_loss += loss.item()
             _, predicted = torch.max(outputs, 1)
-            correct += labels.size(0)
+            correct += (predicted==labels).sum().item()
             total += labels.size(0)
 
     avg_val_loss = val_loss / len(valid_loader)
@@ -202,8 +220,8 @@ for epoch in range(epochs):
 plot_curves(train_losses, val_losses)
 
 # load the best model
-model.load_state_dict(torch.load("/kaggle/working/best_model.pt"))
+model.load_state_dict(torch.load("best_model.pt"))
 
 # save the final model
-dummy_input = torch.randn(1, 3, 48, 48)
+dummy_input = torch.randn(1, 3, 224, 224)
 torch.onnx.export(model.cpu(), dummy_input, "emotional_model.onnx")
