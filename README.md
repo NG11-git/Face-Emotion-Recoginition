@@ -79,23 +79,39 @@ python src/realtime_infer.py
 python src/train.py
 ```
 Recommended:
+
 Image Size: 64x64
+
 Grayscale input
+
 Data augmentation (HorizontalFlip, Rotation)
+
 --
 ## Model Performance
+
 Achieved ~73% training accuracy
-Performance depends on:
+
+### Performance depends on:
+
 Dataset balance
+
 Lighting conditions
+
 Face crop quality
+
 --
+
 ## Known Improvements Implemented
+
 Fixed BGR → RGB conversion
+
 Improved face crop quality
+
 Webcam horizontal flip
+
 Softmax confidence handling
+
 Better preprocessing pipeline
 
-👨‍💻 Author
+#### Author
 Nandhu Gopan
