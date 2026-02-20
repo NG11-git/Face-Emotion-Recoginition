@@ -6,7 +6,11 @@ A real-time Face Emotion Recognition system built using **PyTorch**, **ResNet18 
 
 This project detects faces using MediaPipe and predicts emotions in real-time and also image through a clean Streamlit interface.
 
----
+
+<p align="center">
+<img src="ss.png" width="600">
+</p>
+
 
 ## Tech Stack
 * python
