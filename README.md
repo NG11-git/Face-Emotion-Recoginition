@@ -8,7 +8,21 @@ This project detects faces using MediaPipe and predicts emotions in real-time an
 
 ---
 
-## 🚀 Features
+## Tech Stack
+* python
+* torch
+* torchvision
+* opencv
+* mediapipe
+* ResNet18
+* CBAM
+* numpy
+* matplotlib
+* Pillow
+* streamlit
+
+
+##  Features
 
 -  Face Detection using MediaPipe
 -  ResNet18 with CBAM Attention
@@ -20,7 +34,7 @@ This project detects faces using MediaPipe and predicts emotions in real-time an
 
 ---
 
-## 🧠 Emotion Classes
+##  Emotion Classes
 
 - Angry
 - Disgust
@@ -32,7 +46,7 @@ This project detects faces using MediaPipe and predicts emotions in real-time an
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 ```
 Face-Emotion-Recoginition/
 │
